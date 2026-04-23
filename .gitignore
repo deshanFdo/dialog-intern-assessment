@@ -15,7 +15,7 @@ __pycache__/
 backend/.env
 frontend/.env
 
-# Next.js / Build outputs
+# Build outputs
 .next/
 out/
 build/
