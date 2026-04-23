@@ -51,10 +51,11 @@ class GeminiClient:
     async def chat(self, *, messages: list[ChatMessage]) -> str:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self._model}:generateContent"
 
+        system_instruction = None
         contents = []
         for m in messages:
             if m.role == "system":
-                contents.append({"role": "user", "parts": [{"text": m.content}]})
+                system_instruction = {"parts": [{"text": m.content}]}
                 continue
             role = "user" if m.role == "user" else "model"
             contents.append({"role": role, "parts": [{"text": m.content}]})
@@ -63,6 +64,8 @@ class GeminiClient:
             "contents": contents,
             "generationConfig": {"temperature": 0},
         }
+        if system_instruction:
+            payload["system_instruction"] = system_instruction
 
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(url, params={"key": self._api_key}, json=payload)
