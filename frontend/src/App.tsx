@@ -6,7 +6,7 @@ type AskResponse = {
   sources: Array<{ id: number; score: number; text: string; source: string }>
 }
 
-const apiBaseDefault = 'http://localhost:8000'
+const apiBaseDefault = 'https://dialog-intern-assessment.onrender.com'
 
 export default function App() {
   const apiBase = useMemo(() => import.meta.env.VITE_API_BASE_URL || apiBaseDefault, [])
