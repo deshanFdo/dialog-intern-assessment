@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import './styles.css'
 
 type AskResponse = {
@@ -19,6 +19,22 @@ export default function App() {
   const [askStatus, setAskStatus] = useState<{msg: string, type: 'success'|'error'|'info'} | null>(null)
   const [result, setResult] = useState<AskResponse | null>(null)
   const [busy, setBusy] = useState(false)
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking')
+
+  useEffect(() => {
+    async function checkHealth() {
+      try {
+        const res = await fetch(`${apiBase}/health`)
+        if (res.ok) setBackendStatus('online')
+        else setBackendStatus('offline')
+      } catch (err) {
+        setBackendStatus('offline')
+      }
+    }
+    checkHealth()
+    const interval = setInterval(checkHealth, 30000)
+    return () => clearInterval(interval)
+  }, [apiBase])
 
   async function ingest() {
     setBusy(true)
@@ -42,8 +58,9 @@ export default function App() {
       }
       const data = await resp.json()
       setIngestStatus({msg: `Ingested successfully. Added ${data.chunks_added} chunks. (Total: ${data.total_chunks})`, type: 'success'})
-    } catch (e: any) {
-      setIngestStatus({msg: `Ingest failed: ${String(e?.message || e)}`, type: 'error'})
+    } catch (e: unknown) {
+      const err = e as Error
+      setIngestStatus({msg: `Ingest failed: ${String(err?.message || err)}`, type: 'error'})
     } finally {
       setBusy(false)
     }
@@ -64,8 +81,9 @@ export default function App() {
       }
       const data = (await resp.json()) as AskResponse
       setResult(data)
-    } catch (e: any) {
-      setAskStatus({msg: `Ask failed: ${String(e?.message || e)}`, type: 'error'})
+    } catch (e: unknown) {
+      const err = e as Error
+      setAskStatus({msg: `Ask failed: ${String(err?.message || err)}`, type: 'error'})
     } finally {
       setBusy(false)
     }
@@ -73,10 +91,16 @@ export default function App() {
 
   return (
     <div className="app-container">
+      <div className="status-badge">
+        <span className={`status-dot ${backendStatus}`}></span>
+        <span className="status-text">
+          {backendStatus === 'checking' ? 'Checking Backend...' : backendStatus === 'online' ? 'Backend Online' : 'Backend Offline'}
+        </span>
+      </div>
+
       <header>
         <h1>Document Q&A</h1>
         <p>Your AI Assistant for Context-Grounded Answers</p>
-        <p style={{marginTop: '0.5rem'}}><span className="mono">API: {apiBase}</span></p>
       </header>
 
       <main className="main-grid">

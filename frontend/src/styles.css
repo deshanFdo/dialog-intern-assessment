@@ -142,6 +142,54 @@ header p {
   gap: 0.5rem;
 }
 
+/* Status Badge */
+.status-badge {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.status-dot.checking {
+  background: #f59e0b; /* Amber */
+  color: #f59e0b;
+}
+
+.status-dot.online {
+  background: var(--success); /* Emerald */
+  color: var(--success);
+}
+
+.status-dot.offline {
+  background: var(--danger); /* Red */
+  color: var(--danger);
+}
+
+@media (max-width: 768px) {
+  .status-badge {
+    position: static;
+    margin: 0 auto 1rem auto;
+    width: fit-content;
+  }
+}
+
 /* Forms & Inputs */
 .form-group {
   display: flex;
